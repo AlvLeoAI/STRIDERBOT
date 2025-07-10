@@ -1,0 +1,37 @@
+{
+  "agent_id": "",
+  "channel": "voice",
+  "last_modification_timestamp": 1752176198183,
+  "agent_name": "StriderBot",
+  "response_engine": {
+    "type": "retell-llm",
+    "llm_id": "llm_6e31e1f263c78c5a4f8fe0238e97",
+    "version": 3
+  },
+  "webhook_url": "https://alvleoai.app.n8n.cloud/webhook-test/c8b6be94-36ad-4af6-91a7-491fd3ee5200",
+  "language": "en-US",
+  "opt_out_sensitive_data_storage": false,
+  "opt_in_signed_url": false,
+  "version": 3,
+  "is_published": false,
+  "version_title": "",
+  "post_call_analysis_model": "gpt-4o-mini",
+  "voice_id": "11labs-Cimo",
+  "max_call_duration_ms": 3600000,
+  "interruption_sensitivity": 0.9,
+  "allow_user_dtmf": true,
+  "user_dtmf_options": {},
+  "retellLlmData": {
+    "llm_id": "llm_6e31e1f263c78c5a4f8fe0238e97",
+    "version": 3,
+    "model": "gpt-4.1",
+    "general_prompt": "You are an AI voice assistant working for a used car dealership.\n\nYour job is to:\n- Greet callers warmly and professionally.\n- Collect the caller’s full name, phone number, and vehicle of interest.\n- Answer questions about vehicle availability, mileage, price, year, and condition based on the simulated inventory.\n- Help callers schedule a test drive and confirm the date and time.\n- Handle common objections and provide helpful answers.\n- Offer to transfer the call or schedule a callback with a human agent if needed.\n\nSpeak clearly, use a friendly tone, and always ask follow-up questions if a caller is unsure. If the caller requests to speak with a salesperson, transfer them or offer to schedule a callback.\n\nKeep responses short and helpful. End every call by confirming next steps (e.g., appointment, callback, or lead saved).\n",
+    "states": [],
+    "begin_message": "",
+    "knowledge_base_ids": [],
+    "last_modification_timestamp": 1752169367397,
+    "is_published": false
+  },
+  "conversationFlow": null,
+  "llmURL": null
+}
