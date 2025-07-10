@@ -1,0 +1,552 @@
+{
+  "name": "AI Voice Agent & Workflow Automation System for a Used Car Dealership",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c8b6be94-36ad-4af6-91a7-491fd3ee5200",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        -20
+      ],
+      "id": "6210e578-5530-40ed-b6d5-5eb90d38cfeb",
+      "name": "Webhook",
+      "webhookId": "c8b6be94-36ad-4af6-91a7-491fd3ee5200"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HdxdxNpK4vPTIYUSxniweN1PCZK14Z4GfD-0sGBl9Ok",
+          "mode": "list",
+          "cachedResultName": "Leads - Used Car Demo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HdxdxNpK4vPTIYUSxniweN1PCZK14Z4GfD-0sGBl9Ok/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HdxdxNpK4vPTIYUSxniweN1PCZK14Z4GfD-0sGBl9Ok/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$now}}",
+            "Name ": "={{ $json.message.content.full_name }}",
+            "Phone ": "={{ $json.message.content.phone_number }}",
+            "Vehicle Interested": "={{ $json.message.content.vehicle_of_interest }}",
+            "Appointment Time ": "={{ $json.message.content.requested_test_drive_datetime }}",
+            "Transcript": "={{ $('Webhook').item.json.body.call.transcript }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name ",
+              "displayName": "Name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone ",
+              "displayName": "Phone ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vehicle Interested",
+              "displayName": "Vehicle Interested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Appointment Time ",
+              "displayName": "Appointment Time ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcript",
+              "displayName": "Transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        120,
+        80
+      ],
+      "id": "29640bb1-9f8a-40c1-a5bf-845ac32e118f",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You will receive a phone call transcript between a user and an AI agent.  \nYour task is to extract and return a JSON object with the following fields:\n\n- full_name  \n- phone_number  \n- vehicle_of_interest  \n- requested_test_drive_datetime  \n- intent (either \"test_drive\", \"question\", or \"fallback\")\n\nIf the user asks to speak to a human, be transferred, or expresses dissatisfaction, set intent to \"fallback\".\n\nOnly return a valid JSON object.\n\nTranscript:\n{{ $json[\"body\"][\"call\"][\"transcript\"] }}\n\n\n\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -460,
+        -20
+      ],
+      "id": "d08710dc-b560-45da-9df7-65e415f17b02",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "to": "={{ $json[\"Phone \"] }}",
+        "message": "“Hi Alvaro, thanks for calling. You’re scheduled for a test drive of the 2020 Ford F-150 tomorrow at 4 PM. See you soon!”",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        340,
+        80
+      ],
+      "id": "7029442d-9db7-43a9-9852-c5b9222b3e13",
+      "name": "Send an SMS/MMS/WhatsApp message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9662188c-9b76-4061-868e-87f366ec4ee1",
+              "leftValue": "={{ $json.message.content.intent }}",
+              "rightValue": "talk to a human",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -100,
+        -20
+      ],
+      "id": "3ff80964-9f58-4ac6-ae35-11824e0b1f10",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08RY8R1U9Z",
+          "mode": "list",
+          "cachedResultName": "alvaroleopoldovazquez"
+        },
+        "text": "=⚠️ *AI Fallback Triggered – Human Agent Required*\n\nThe caller requested to speak with a human or could not be handled by the AI voice agent. Here's what we captured:\n\n👤 *Name:* {{$json[\"message\"][\"content\"][\"full_name\"]}}  \n📞 *Phone:* {{$json[\"message\"][\"content\"][\"phone_number\"]}}  \n🚘 *Vehicle:* {{$json[\"message\"][\"content\"][\"vehicle_of_interest\"]}}  \n🕒 *Appointment (if any):* {{$json[\"message\"][\"content\"][\"requested_test_drive_datetime\"] || \"Not scheduled\"}}\n\n📝 *Transcript excerpt:*  \n\"{{ $json[\"body\"][\"call\"][\"transcript\"].slice(0, 280) }}...\"\n\n_Review this lead and follow up manually._\n",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        120,
+        -120
+      ],
+      "id": "14ffbdab-5adc-49fc-9acd-f22db9ec9b78",
+      "name": "Send a message",
+      "webhookId": "083dc69f-a62a-46dc-a002-88e6138f7ddb",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "87944c46-5e36-4bc2-92cc-213754cb3bd3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        440
+      ],
+      "id": "6abaa070-dc90-4ff7-98db-7112e7be6e63",
+      "name": "Webhook1",
+      "webhookId": "87944c46-5e36-4bc2-92cc-213754cb3bd3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI Agent message from input\nconst aiMessage = items[0].json.output;\n\n// Return it formatted\nreturn [\n  {\n    json: {\n      formattedMessage: aiMessage\n    }\n  }\n];\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        440
+      ],
+      "id": "635894ee-6ae4-495b-b4ff-7eb740ceff6a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cae9cecd-5ae5-47c6-a539-310501dd1625",
+              "name": "message",
+              "value": "={{ $json.formattedMessage }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        120,
+        440
+      ],
+      "id": "68110045-6ea1-4403-8ca5-036ebf8a0bd4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        340,
+        440
+      ],
+      "id": "ad5366de-58a2-4639-8846-9bc35f40b11e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a friendly and persuasive AI assistant for a used car dealership. When someone asks about a car, use the model and year provided to look up the available inventory and respond as if you're talking to the customer directly. Mention details like mileage, color, price, and whether the vehicle is available. Keep it short, informative, and engaging. Offer to schedule a test drive if the vehicle is available. Google Sheet ID: 1ipblLN5jsTmmkFXYmAfrhMijoCm48-GAkkmD6fuHMt0\n\nYear:{{ $json.year }}\nModel: {{ $json.model }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        440
+      ],
+      "id": "6a324b32-5363-45bb-804f-27fe11cc36bd",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -500,
+        660
+      ],
+      "id": "32d643f7-8daa-423b-9143-b70dee8de87c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ipblLN5jsTmmkFXYmAfrhMijoCm48-GAkkmD6fuHMt0",
+          "mode": "list",
+          "cachedResultName": "Car_Inventory_",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ipblLN5jsTmmkFXYmAfrhMijoCm48-GAkkmD6fuHMt0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ipblLN5jsTmmkFXYmAfrhMijoCm48-GAkkmD6fuHMt0/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        -320,
+        660
+      ],
+      "id": "10a38b3b-9374-4f69-a883-b4101479fd08",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "🟨 Sticky Note — GPT Message Routing Workflow\nTitle: AI-Powered Lead Follow-Up\n\nDescription:\n\nThis workflow receives a POST request via webhook (e.g. from a CRM or bot), and sends the data to a GPT model for message generation. Based on the model output, an IF condition routes the flow:\n\n✅ If true: Sends a message to Slack.\n\n❌ If false: Appends lead data to a Google Sheet and sends an SMS/WhatsApp message using Twilio.\n\nPurpose:\n\nAutomate lead engagement using AI-generated responses, then route messages to internal teams or customers across different platforms.",
+        "height": 400,
+        "width": 600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1300,
+        -60
+      ],
+      "typeVersion": 1,
+      "id": "f512a6b8-4529-41fe-88e7-d65595faa686",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "🟨 Sticky Note — Retell AI Voicebot Integration\nTitle: Voicebot → GPT Response Engine\n\nDescription:\n\nThis flow is triggered by a GET request from Retell AI. It sends the caller’s message to a GPT-based AI Agent, which uses contextual memory and optionally Google Sheets data to generate a tailored response.\n\nThe response is formatted via a code block, passed through a manual field mapper, and sent back using the Respond to Webhook module — allowing real-time, intelligent replies to callers via the Retell voicebot.\n\nPurpose:\n\nCreate a dynamic conversation loop between Retell voice calls and OpenAI GPT responses — personalized, fast, and automated.",
+        "height": 360,
+        "width": 600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1300,
+        380
+      ],
+      "typeVersion": 1,
+      "id": "4ce0c239-5b7c-4047-9dc7-9b1c6f6b3934",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "Send an SMS/MMS/WhatsApp message": [
+      {
+        "json": {
+          "status": "SMS_SENT (simulated)",
+          "to": "549-341-8755",
+          "message": "Hi Alvaro, thanks for calling. You're scheduled for a test drive of the 2020 Ford F-150 tomorrow at 4 PM."
+        }
+      }
+    ],
+    "Webhook1": [
+      {
+        "json": {
+          "year": "2020",
+          "model": "Explorer"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9fe3594-b391-4546-9884-bada10546ceb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "13e20c97097a8d1de6d76dbd27c72163b6f6ec6e4a342023f3f77157e413842e"
+  },
+  "id": "BQiuqZkyJW5WZK7Q",
+  "tags": []
+}
